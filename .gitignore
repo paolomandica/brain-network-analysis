@@ -295,6 +295,7 @@ $RECYCLE.BIN/
 
 ### Folders ###
 data/*
+!data/S002
 
 ### Files ###
 *.docx
