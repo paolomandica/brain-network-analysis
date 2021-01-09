@@ -3,6 +3,7 @@ import numpy as np
 import connectivipy as cp
 import matplotlib.pyplot as plt
 import mne
+import pandas as pd
 import networkx as nx
 
 
@@ -72,3 +73,14 @@ def connectivity(freq,values,p,channels,sample_freq,G,density,connectivity_matri
         A[A>0] = 1
         binary_adjacency_matrix = A
         return connectivity_matrix, binary_adjacency_matrix
+
+
+def draw_Graph(Adj,position,channels):
+    G = nx.from_numpy_matrix(Adj, create_using=nx.DiGraph)
+    ch_dict = { i : channels[i] for i in range(0, len(channels))}
+    G = nx.relabel_nodes(G,ch_dict)
+    pos = {position['label'][i] : (position['x'][i],position['y'][i]) for i in range(len(channels)) }
+    f = plt.figure(figsize=(10, 10))
+    nx.draw(G,pos, node_size=700, node_color = 'lightcyan',edge_color ='silver')
+    nx.draw_networkx_labels(G, pos=pos, font_color='black')
+    plt.show()

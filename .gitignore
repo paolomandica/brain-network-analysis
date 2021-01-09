@@ -296,7 +296,7 @@ $RECYCLE.BIN/
 ### Folders ###
 data/*
 !data
-
+!channel_locations.txt
 ### Files ###
 *.docx
 .vscode/launch.json
