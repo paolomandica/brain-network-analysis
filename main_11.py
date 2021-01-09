@@ -4,7 +4,7 @@ import connectivipy as cp
 import matplotlib.pyplot as plt
 import mne
 import networkx as nx
-from functions_11 import *
+from functions import *
 
 
 

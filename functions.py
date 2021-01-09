@@ -3,6 +3,7 @@ import numpy as np
 import connectivipy as cp
 import matplotlib.pyplot as plt
 import mne
+import pandas as pd
 import networkx as nx
 
 
