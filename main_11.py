@@ -33,8 +33,7 @@ print('Computing PDC for open eyes data')
 
 connectivity_matrix, binary_adjacency_matrix = connectivity(freq_alpha,values=values,p=p,channels=channels,sample_freq=sample_freq,G=G,density=density,connectivity_matrix = connectivity_matrix,
              binary_adjacency_matrix=binary_adjacency_matrix
-                ,method='PDC', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2,
-                 mode=0)
+                ,method='PDC', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2)
 
 
 plt.imshow(binary_adjacency_matrix,cmap='Greys',interpolation='nearest')
@@ -59,8 +58,7 @@ freq_alpha = 10
 
 connectivity_matrix, binary_adjacency_matrix = connectivity(freq_alpha,values=values,p=p,channels=channels,sample_freq=sample_freq,G=G,density=density,connectivity_matrix = connectivity_matrix,
              binary_adjacency_matrix=binary_adjacency_matrix
-                ,method='PDC', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2,
-                 mode=0)
+                ,method='PDC', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2)
 
 
 plt.imshow(binary_adjacency_matrix,cmap='Greys',interpolation='nearest')
@@ -91,8 +89,7 @@ print('Computing DTF for open eyes data')
 
 connectivity_matrix, binary_adjacency_matrix = connectivity(freq_alpha,values=values,p=p,channels=channels,sample_freq=sample_freq,G=G,density=density,connectivity_matrix = connectivity_matrix,
              binary_adjacency_matrix=binary_adjacency_matrix
-                ,method='DTF', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2,
-                 mode=0)
+                ,method='DTF', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2)
 
 
 plt.imshow(binary_adjacency_matrix,cmap='Greys',interpolation='nearest')
@@ -116,8 +113,7 @@ freq_alpha = 10
 
 connectivity_matrix, binary_adjacency_matrix = connectivity(freq_alpha,values=values,p=p,channels=channels,sample_freq=sample_freq,G=G,density=density,connectivity_matrix = connectivity_matrix,
              binary_adjacency_matrix=binary_adjacency_matrix
-                ,method='DTF', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2,
-                 mode=0)
+                ,method='DTF', algorithm='yw',order=None,max_order=10,plot=True,resolution=100,threshold=0.2)
 
 
 plt.imshow(binary_adjacency_matrix,cmap='Greys',interpolation='nearest')

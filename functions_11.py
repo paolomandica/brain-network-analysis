@@ -19,8 +19,7 @@ def open_file(path):
     return values,channels,num_of_channels,num_of_samples,sample_freq
 
 def connectivity(freq,values,p,channels,sample_freq,G,density,connectivity_matrix,binary_adjacency_matrix
-                , method,algorithm='yw',order=None,max_order=10,plot=False,resolution=100,threshold=None,
-                 mode=0):
+                , method,algorithm='yw',order=None,max_order=10,plot=False,resolution=100,threshold=None):
 
         if not order:
             best,crit = cp.Mvar.order_akaike(values,max_order) 
