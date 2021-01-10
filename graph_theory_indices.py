@@ -12,7 +12,16 @@ from networkx.algorithms import average_shortest_path_length, average_clustering
 
 
 class GraphTheoryIndices:
+    """Class to handle data and methods for Graph Theory Indices
+    exercise (ex. 2)."""
+
     def __init__(self, path):
+        """
+        Args:
+        ----------
+        path : string
+            File path of the EDF file.
+        """
         self.path = path
         self.G = nx.DiGraph()
         self.sample_freq = None
@@ -23,6 +32,9 @@ class GraphTheoryIndices:
         self.read_edf_data()
 
     def read_edf_data(self):
+        """Reads the EDF file and saves data and info as attributes
+        of the class instance.
+        """
         raw = mne.io.read_raw_edf(self.path)
         df = raw.to_data_frame()
         self.sample_freq = raw.info['sfreq']
@@ -35,7 +47,8 @@ class GraphTheoryIndices:
     def compute_connectivity(self, freq, method="PDC", algorithm="yw",
                              order=None, max_order=10, plot=False,
                              resolution=100, threshold=None):
-
+        """Pass
+        """
         if not order:
             best, crit = cp.Mvar.order_akaike(self.values, max_order)
             if plot:
@@ -101,6 +114,21 @@ class GraphTheoryIndices:
         self.Gw = nx.relabel.relabel_nodes(Gw, new_labels, copy=True)
 
     def compute_global_indices(self, weighted=False):
+        """Computes Average Clustering Coefficient and Average Path Length
+        of the graph (binary or weighted).
+
+        Args:
+        ----------
+        weighted : boolean (default=False)
+            If True, use the weighted graph, otherwise use the binary one.
+
+        Returns:
+        ----------
+        avg_cl_coef : float
+            Average clustering coefficient
+        avg_path_len : float
+            Average path length
+        """
         if weighted:
             avg_cl_coef = average_clustering(self.Gw, weight='weight')
             avg_path_len = average_shortest_path_length(self.Gw,
@@ -111,6 +139,22 @@ class GraphTheoryIndices:
         return avg_cl_coef, avg_path_len
 
     def compute_local_indices(self, weighted=False):
+        """Computes degree, in-degree and out-degree of the graph
+        (binary or weighted).
+
+        Args:
+        ----------
+        weighted : boolean (default=False)
+            If True, use the weighted graph, otherwise use the binary one.
+
+        Returns:
+        ----------
+        degree : list of 2-tuples (node, degree)
+
+        in_degree : list of 2-tuples (node, in_degree)
+
+        out_degree : list of 2-tuples (node, out_degree)
+        """
         if weighted:
             G = self.Gw
         else:
@@ -124,6 +168,14 @@ class GraphTheoryIndices:
         return degree, in_degree, out_degree
 
     def plot_global_indices(self, thresholds):
+        """Computes and plots the variation of global indices (ACC, APL)
+        of graphs constructed with different density thresholds.
+
+        Args:
+        -----------
+        thresholds : list of floats
+            List of density thresholds used to build the graphs.
+        """
         avg_cl_coeffs = []
         avg_path_lens = []
 
@@ -156,8 +208,12 @@ class GraphTheoryIndices:
         plt.show()
 
     def compute_SMI(self):
-        # Compute the mean clustering coefficient and average shortest path length
-        # for an equivalent random graph
+        """Compute the small-worldness index of the binary directed graph.
+
+        Returns:
+        -----------
+        SMI : float
+        """
         randMetrics = {"C": [], "L": []}
         print("Computing random graphs...")
         for i in range(10):
@@ -172,5 +228,6 @@ class GraphTheoryIndices:
         Cr = np.mean(randMetrics["C"])
         Lr = np.mean(randMetrics["L"])
 
-        self.SMI = (C / Cr) / (L / Lr)
+        SMI = (C / Cr) / (L / Lr)
         print("Completed!")
+        return SMI
