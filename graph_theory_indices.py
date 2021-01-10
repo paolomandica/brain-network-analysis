@@ -89,22 +89,39 @@ class GraphTheoryIndices:
         self.connectivity_matrix = connectivity_matrix
         self.binary_adjacency_matrix = binary_adjacency_matrix
 
+        # create directed binary graph
         G = nx.DiGraph(binary_adjacency_matrix)
         new_labels = {}
         for i, node in enumerate(G.nodes):
             new_labels[node] = self.channels[i]
         self.G = nx.relabel.relabel_nodes(G, new_labels, copy=True)
 
-    def compute_global_indices(self):
-        self.avg_cl_coef = average_clustering(self.G)
-        self.avg_path_len = average_shortest_path_length(self.G)
+        # create directed weighted graph
+        Gw = nx.DiGraph(connectivity_matrix)
+        self.Gw = nx.relabel.relabel_nodes(Gw, new_labels, copy=True)
 
-    def compute_local_indices(self):
-        self.degree = sorted(self.G.degree(), key=lambda x: x[1], reverse=True)
-        self.in_degree = sorted(
-            self.G.in_degree(), key=lambda x: x[1], reverse=True)
-        self.out_degree = sorted(
-            self.G.out_degree(), key=lambda x: x[1], reverse=True)
+    def compute_global_indices(self, weighted=False):
+        if weighted:
+            avg_cl_coef = average_clustering(self.Gw, weight='weight')
+            avg_path_len = average_shortest_path_length(self.Gw,
+                                                        weight='weight')
+        else:
+            avg_cl_coef = average_clustering(self.G)
+            avg_path_len = average_shortest_path_length(self.G)
+        return avg_cl_coef, avg_path_len
+
+    def compute_local_indices(self, weighted=False):
+        if weighted:
+            G = self.Gw
+        else:
+            G = self.G
+
+        degree = sorted(G.degree(), key=lambda x: x[1], reverse=True)
+        in_degree = sorted(
+            G.in_degree(), key=lambda x: x[1], reverse=True)
+        out_degree = sorted(
+            G.out_degree(), key=lambda x: x[1], reverse=True)
+        return degree, in_degree, out_degree
 
     def plot_global_indices(self, thresholds):
         avg_cl_coeffs = []
@@ -115,9 +132,9 @@ class GraphTheoryIndices:
             print("Computing for t =", t)
             self.compute_connectivity(freq=10, threshold=t)
             try:
-                self.compute_global_indices()
-                avg_cl_coeffs.append(self.avg_cl_coef)
-                avg_path_lens.append(self.avg_path_len)
+                acc, apl = self.compute_global_indices()
+                avg_cl_coeffs.append(acc)
+                avg_path_lens.append(apl)
             except:
                 avg_cl_coeffs.append(0)
                 avg_path_lens.append(0)
@@ -151,9 +168,7 @@ class GraphTheoryIndices:
             randMetrics["L"].append(average_shortest_path_length(G_r))
 
         print("Computing SMI...")
-        self.compute_global_indices()
-        C = self.avg_cl_coef
-        L = self.avg_path_len
+        C, L = self.compute_global_indices()
         Cr = np.mean(randMetrics["C"])
         Lr = np.mean(randMetrics["L"])
 
