@@ -18,12 +18,14 @@ class ConnectivityGraph:
         path : string
             Filepath of the EDF file.
         """
+        self.channel_loc_path = "./data/channel_locations.txt"
         self.sample_freq = None
         self.values = None
         self.channels = None
         self.num_of_channels = None
         self.num_of_samples = None
         self.read_edf_data(path)
+        self.channel_locations = None
         self.connectivity_matrix = None
         self.binary_adjacency_matrix = None
         self.G = None
@@ -46,6 +48,21 @@ class ConnectivityGraph:
         self.channels = list(map(lambda x: x.strip('.'), df.columns))
         self.num_of_channels, self.num_of_samples = self.values.shape
         print("EDF data loaded!")
+
+    def load_channel_locations(self):
+        locations = {}
+
+        with open(self.channel_loc_path, newline='') as fp:
+            _ = fp.__next__()
+
+            for line in fp:
+                _, label, x, y = line.split()
+                label = label.rstrip(".")
+                x = float(x)
+                y = float(y)
+                locations[label] = (x, y)
+
+            self.channel_locations = locations
 
     def compute_connectivity(self, freq, method="PDC", algorithm="yw",
                              order=None, max_order=10, plot=False,
@@ -105,13 +122,18 @@ class ConnectivityGraph:
         self.connectivity_matrix = connectivity_matrix
         self.binary_adjacency_matrix = binary_adjacency_matrix
 
+        # load coordinates
+        self.load_channel_locations()
+
         # create directed binary graph
         G = nx.DiGraph(binary_adjacency_matrix)
         new_labels = {}
         for i, node in enumerate(G.nodes):
             new_labels[node] = self.channels[i]
         self.G = nx.relabel.relabel_nodes(G, new_labels, copy=True)
+        # nx.set_node_attributes(self.G, self.channel_locations, "pos")
 
         # create directed weighted graph
         Gw = nx.DiGraph(connectivity_matrix)
         self.Gw = nx.relabel.relabel_nodes(Gw, new_labels, copy=True)
+        # nx.set_node_attributes(self.Gw, self.channel_locations, "pos")

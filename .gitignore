@@ -300,3 +300,4 @@ data/*
 ### Files ###
 *.docx
 .vscode/launch.json
+tests.py
