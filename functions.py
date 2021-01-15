@@ -9,14 +9,22 @@ import networkx as nx
 chan_19 = 'Fp1 Fp2 F7 F3 Fz F4 F8 T7 C3 Cz C4 T8 P7 P3 Pz P4 P8 O1 O2'.split(' ')
 
 
-def open_file(path):
+def open_file(path,sub_channels=False):
     open_eyes_raw = mne.io.read_raw_edf(path)
     open_eyes_df = open_eyes_raw.to_data_frame()
     sample_freq = open_eyes_raw.info['sfreq']
     open_eyes_data = open_eyes_df.drop(['time'],axis=1)
-    values = open_eyes_data.T.values
-    channels = list(map(lambda x:x.strip('.'),open_eyes_data.columns))
-    num_of_channels, num_of_samples = values.shape
+    if sub_channels:
+        channels = list(map(lambda x:x.strip('.'),open_eyes_data.columns))
+        open_eyes_data.columns = channels
+        channels = 'Fp1 Fp2 F7 F3 Fz F4 F8 T7 C3 Cz C4 T8 P7 P3 Pz P4 P8 O1 O2'.split(' ')
+        open_eyes_data = open_eyes_data[channels]
+        values = open_eyes_data.T.values
+        num_of_channels,num_of_samples = values.shape
+    else:
+        values = open_eyes_data.T.values
+        channels = list(map(lambda x:x.strip('.'),open_eyes_data.columns))
+        num_of_channels, num_of_samples = values.shape
     return values,channels,num_of_channels,num_of_samples,sample_freq
 
 def connectivity(freq,values,p,channels,sample_freq,G,density,connectivity_matrix,binary_adjacency_matrix
@@ -86,6 +94,7 @@ def draw_Graph(Adj,position,channels):
     plt.show()
 
 
+chan_19 = 'Fp1 Fp2 F7 F3 Fz F4 F8 T7 C3 Cz C4 T8 P7 P3 Pz P4 P8 O1 O2'.split(' ')
 def significance(values,method,max_order,signf_threshold=0.05,channels=chan_19,Nrep=200,alpha=0.05):
         best,crit = cp.Mvar.order_akaike(values,max_order)
         order = best
@@ -96,6 +105,6 @@ def significance(values,method,max_order,signf_threshold=0.05,channels=chan_19,N
         else:
             matrix_values = data.conn('pdc')
         significance_matrix = data.significance(Nrep=Nrep, alpha=alpha,verbose=False)
-        significance_matrix[significance_matrix<=0.05] = 1
+        significance_matrix[significance_matrix<0.05] = 1
         significance_matrix[significance_matrix!=1] = 0
         return significance_matrix
