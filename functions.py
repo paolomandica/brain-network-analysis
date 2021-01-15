@@ -6,7 +6,7 @@ import mne
 import pandas as pd
 import networkx as nx
 
-
+chan_19 = 'Fp1 Fp2 F7 F3 Fz F4 F8 T7 C3 Cz C4 T8 P7 P3 Pz P4 P8 O1 O2'.split(' ')
 
 
 def open_file(path):
@@ -84,3 +84,18 @@ def draw_Graph(Adj,position,channels):
     nx.draw(G,pos, node_size=700, node_color = 'lightcyan',edge_color ='silver')
     nx.draw_networkx_labels(G, pos=pos, font_color='black')
     plt.show()
+
+
+def significance(values,method,max_order,signf_threshold=0.05,channels=chan_19,Nrep=200,alpha=0.05):
+        best,crit = cp.Mvar.order_akaike(values,max_order)
+        order = best
+        data = cp.Data(values,chan_names=channels)
+        data.fit_mvar(order,'yw')
+        if method == 'DTF':
+            matrix_values = data.conn('dtf')
+        else:
+            matrix_values = data.conn('pdc')
+        significance_matrix = data.significance(Nrep=Nrep, alpha=alpha,verbose=False)
+        significance_matrix[significance_matrix<=0.05] = 1
+        significance_matrix[significance_matrix!=1] = 0
+        return significance_matrix
