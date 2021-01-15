@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import mne
 import pandas as pd
 import networkx as nx
+import infomap
 
 
 def open_file(path):
