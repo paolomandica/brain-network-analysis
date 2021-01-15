@@ -1,8 +1,6 @@
-import pyedflib
 import numpy as np
 import connectivipy as cp
 import matplotlib.pyplot as plt
-import mne
 import networkx as nx
 import bct
 
@@ -104,18 +102,20 @@ class GraphTheoryIndices(ConnectivityGraph):
         seconds = int(time() - start)
         print("Time passed: %d seconds" % (seconds))
 
-        plt.figure(figsize=(6, 4))
+        plt.figure(figsize=(12, 5))
+
+        plt.subplot(1, 2, 1)
         plt.title("Avg clustering coeff behavior")
         plt.plot(thresholds, avg_cl_coeffs)
         plt.xlabel("Threshold")
         plt.ylabel("Avg clustering coeff")
-        plt.show()
 
-        plt.figure(figsize=(6, 4))
+        plt.subplot(1, 2, 2)
         plt.title("Avg path length behavior")
         plt.plot(thresholds, avg_path_lens)
         plt.xlabel("Threshold")
         plt.ylabel("Avg path length")
+
         plt.show()
 
     def compute_SMI(self):
