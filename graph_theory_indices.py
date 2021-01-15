@@ -41,12 +41,14 @@ class GraphTheoryIndices(ConnectivityGraph):
             avg_path_len = average_shortest_path_length(self.G)
         return avg_cl_coef, avg_path_len
 
-    def compute_local_indices(self, weighted=False):
+    def compute_local_indices(self, sort=True, weighted=False):
         """Computes degree, in-degree and out-degree of the graph
         (binary or weighted).
 
         Args:
         ----------
+        sort : boolean (default=True)
+            Wheter to return sorted results, or not.
         weighted : boolean (default=False)
             If True, use the weighted graph, otherwise use the binary one.
 
@@ -63,11 +65,17 @@ class GraphTheoryIndices(ConnectivityGraph):
         else:
             G = self.G
 
-        degree = sorted(G.degree(), key=lambda x: x[1], reverse=True)
-        in_degree = sorted(
-            G.in_degree(), key=lambda x: x[1], reverse=True)
-        out_degree = sorted(
-            G.out_degree(), key=lambda x: x[1], reverse=True)
+        if sort:
+            degree = sorted(G.degree(), key=lambda x: x[1], reverse=True)
+            in_degree = sorted(
+                G.in_degree(), key=lambda x: x[1], reverse=True)
+            out_degree = sorted(
+                G.out_degree(), key=lambda x: x[1], reverse=True)
+        else:
+            degree = G.degree()
+            in_degree = G.in_degree()
+            out_degree = G.out_degree()
+
         return degree, in_degree, out_degree
 
     def plot_global_indices(self, thresholds):
@@ -134,3 +142,29 @@ class GraphTheoryIndices(ConnectivityGraph):
         SMI = (C / Cr) / (L / Lr)
         print("Completed!")
         return SMI
+
+    def draw_local_indices(self, index=None):
+        """Compute local indices and plot the corresponding graph.
+        Uses the selected local index to compute the node size.
+
+        Args:
+        -----------
+        index : string
+            Select between "degree", "in_degree" and "out_degree".
+        """
+        assert index in ["degree", "in_degree", "out_degree"]
+
+        degree, in_degree, out_degree = self.compute_local_indices(sort=False)
+
+        if index == "degree":
+            idx = degree
+        elif index == "in_degree":
+            idx = in_degree
+        else:
+            idx = out_degree
+
+        node_size = [d**2 for (n, d) in idx]
+        plt.figure(figsize=(12, 10))
+        nx.draw_networkx(self.G, pos=self.channel_locations,
+                         node_size=node_size, arrowsize=1,
+                         node_color='lightcyan', edge_color='silver')
