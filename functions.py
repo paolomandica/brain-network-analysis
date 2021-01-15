@@ -94,12 +94,17 @@ def draw_Graph(Adj,position,channels):
     plt.show()
 
 
-chan_19 = 'Fp1 Fp2 F7 F3 Fz F4 F8 T7 C3 Cz C4 T8 P7 P3 Pz P4 P8 O1 O2'.split(' ')
-def significance(values,method,max_order,signf_threshold=0.05,channels=chan_19,Nrep=200,alpha=0.05):
-        best,crit = cp.Mvar.order_akaike(values,max_order)
-        order = best
+def significance(values,method,max_order,order=None,signf_threshold=0.05,channels=chan_19,Nrep=200,alpha=0.05):
+        if not order:
+            best,crit = cp.Mvar.order_akaike(values,max_order)
+            plt.plot(1+np.arange(len(crit)), crit,marker='o', linestyle='dashed',markersize=8,markerfacecolor='yellow')
+            plt.grid()
+            plt.show()
+        else:
+            p=order
+        p = best
         data = cp.Data(values,chan_names=channels)
-        data.fit_mvar(order,'yw')
+        data.fit_mvar(p,'yw')
         if method == 'DTF':
             matrix_values = data.conn('dtf')
         else:
