@@ -296,6 +296,7 @@ $RECYCLE.BIN/
 ### Folders ###
 data/*
 !data
+!data/img
 !channel_locations.txt
 ### Files ###
 *.docx

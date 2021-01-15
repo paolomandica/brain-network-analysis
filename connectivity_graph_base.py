@@ -31,7 +31,7 @@ class ConnectivityGraph:
         self.G = None
         self.Gw = None
 
-    def read_edf_data(self, path):
+    def read_edf_data(self, path, sub_channels=False):
         """Reads the EDF file and saves data and info as attributes
         of the class instance.
 
@@ -44,8 +44,15 @@ class ConnectivityGraph:
         df = raw.to_data_frame()
         self.sample_freq = raw.info['sfreq']
         df = df.drop(['time'], axis=1)
-        self.values = df.T.values
         self.channels = list(map(lambda x: x.strip('.'), df.columns))
+        df.columns = self.channels
+
+        if sub_channels:
+            self.channels = 'Fp1 Fp2 F7 F3 Fz F4 F8 T7 C3 Cz C4 T8 P7 P3 Pz P4 P8 O1 O2'.split(
+                ' ')
+            df = df[sub_channels]
+
+        self.values = df.T.values
         self.num_of_channels, self.num_of_samples = self.values.shape
         print("EDF data loaded!")
 
@@ -137,6 +144,32 @@ class ConnectivityGraph:
         Gw = nx.DiGraph(connectivity_matrix)
         self.Gw = nx.relabel.relabel_nodes(Gw, new_labels, copy=True)
         # nx.set_node_attributes(self.Gw, self.channel_locations, "pos")
+
+    def significance(self, method, max_order, order=None,
+                     signf_threshold=0.05, Nrep=200, alpha=0.05):
+        if not order:
+            best, crit = cp.Mvar.order_akaike(self.values, max_order)
+            plt.plot(1+np.arange(len(crit)), crit, marker='o',
+                     linestyle='dashed', markersize=8, markerfacecolor='yellow')
+            plt.grid()
+            plt.show()
+            p = best
+        else:
+            p = order
+        print()
+        print('best model order p: {}'.format(p))
+        print()
+        data = cp.Data(self.values, chan_names=self.channels)
+        data.fit_mvar(p, 'yw')
+        if method == 'DTF':
+            matrix_values = data.conn('dtf')
+        else:
+            matrix_values = data.conn('pdc')
+        significance_matrix = data.significance(
+            Nrep=Nrep, alpha=alpha, verbose=False)
+        significance_matrix[significance_matrix < 0.05] = 1
+        significance_matrix[significance_matrix != 1] = 0
+        self.significance_matrix = significance_matrix
 
     def draw_Graph(self, values=None):
         if values is not None:
