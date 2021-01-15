@@ -137,3 +137,13 @@ class ConnectivityGraph:
         Gw = nx.DiGraph(connectivity_matrix)
         self.Gw = nx.relabel.relabel_nodes(Gw, new_labels, copy=True)
         # nx.set_node_attributes(self.Gw, self.channel_locations, "pos")
+
+    def draw_Graph(self, values=None):
+        if values is not None:
+            node_color = values
+        else:
+            node_color = 'lightcyan'
+
+        plt.figure(figsize=(12, 10))
+        nx.draw_networkx(self.G, pos=self.channel_locations, arrowsize=1,
+                         node_color=node_color, edge_color='silver')

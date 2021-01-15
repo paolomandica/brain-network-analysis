@@ -92,6 +92,7 @@ def draw_Graph_values(G,position,channels, values):
     nx.draw(G,pos, node_size=700, node_color = values,edge_color ='silver')
     nx.draw_networkx_labels(G, pos=pos, font_color='black')
     plt.show()
+    return G
 
 
 def create_grapf_motifs(motifs_louzoun):
