@@ -103,6 +103,9 @@ def significance(values,method,max_order,order=None,signf_threshold=0.05,channel
         else:
             p=order
         p = best
+        print()
+        print('best model order p: {}'.format(best))
+        print()
         data = cp.Data(values,chan_names=channels)
         data.fit_mvar(p,'yw')
         if method == 'DTF':
