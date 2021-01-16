@@ -298,7 +298,11 @@ data/*
 !data
 !data/img
 !channel_locations.txt
+
 ### Files ###
 *.docx
 .vscode/launch.json
 tests.py
+main_*.py
+functions*.py
+bioinf.ipynb
