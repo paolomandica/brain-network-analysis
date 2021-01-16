@@ -11,7 +11,7 @@ import community as community_louvain
 from connectivity_graph_base import ConnectivityGraph
 
 
-class MotifAnalyzer(ConnectivityGraph):
+class MotifCommunityAnalyzer(ConnectivityGraph):
 
     def compute_motifs(self, algorithm):
         motifs = nsm.motifs(

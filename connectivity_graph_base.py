@@ -71,10 +71,29 @@ class ConnectivityGraph:
 
             self.channel_locations = locations
 
-    def compute_connectivity(self, freq, method="PDC", algorithm="yw",
+    def compute_connectivity(self, freq, method="PDC",
                              order=None, max_order=10, plot=False,
                              resolution=100, threshold=None):
-        """Pass
+        """Compute the connectivity matrix and the binary matrix of the EEG data,
+        using PDC or DTF method for the estimation.
+
+        Args:
+        -----------
+        freq : int
+            Frequency value for the connectivity matrix.
+        method : string
+            "PDC" or "EDF". Estimation method for connectivity.
+        order : int
+            Value of order of autoregressive multivariate model.
+        max_order : int
+            Max order computable by akaike algorithm.
+        plot : boolean
+            Whether to plot the akaike algo results or not.
+        resolution : int
+            Number of spectrum datapoints.
+        threshold : float
+            Density threshold for the computation of the connectivity matrix.
+            Between 0 and 1.
         """
         if not order:
             best, crit = cp.Mvar.order_akaike(self.values, max_order)
@@ -89,7 +108,7 @@ class ConnectivityGraph:
             p = order
 
         data = cp.Data(self.values, chan_names=self.channels)
-        data.fit_mvar(p, algorithm)
+        data.fit_mvar(p, "ym")
         # multivariate model coefficient (see slides)
         ar, vr = data.mvar_coefficients
         if method == 'DTF':
@@ -146,8 +165,26 @@ class ConnectivityGraph:
         self.Gw = nx.relabel.relabel_nodes(Gw, new_labels, copy=True)
         # nx.set_node_attributes(self.Gw, self.channel_locations, "pos")
 
-    def significance(self, method, max_order, order=None,
+    def significance(self, method="DTF", max_order, order=None,
                      signf_threshold=0.05, Nrep=200, alpha=0.05):
+        """Compute and plot the binary matrix having as positive elements
+        the related p-values of the significance matrix less than threshold.
+
+        Args:
+        -----------
+        method : string
+            "PDC" or "EDF". Estimation method for connectivity.
+        order : int
+            Value of order of autoregressive multivariate model.
+        max_order : int
+            Max order computable by akaike algorithm.
+        signf_threshold : float
+            Threshold for p-values of the significance matrix.
+        Nrep : int
+            Number of resamples for the computation of the significance matrix.
+        alpha : float
+            Type 1 error rate for the significance level.
+        """
         if not order:
             best, crit = cp.Mvar.order_akaike(self.values, max_order)
             plt.plot(1+np.arange(len(crit)), crit, marker='o',
@@ -158,7 +195,7 @@ class ConnectivityGraph:
         else:
             p = order
         print('Best model order p: {}'.format(p))
-        
+
         data = cp.Data(self.values, chan_names=self.channels)
         data.fit_mvar(p, 'yw')
         if method == 'DTF':
