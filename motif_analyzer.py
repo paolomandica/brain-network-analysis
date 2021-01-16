@@ -12,14 +12,32 @@ from connectivity_graph_base import ConnectivityGraph
 
 
 class MotifCommunityAnalyzer(ConnectivityGraph):
-
+    """Class to handle data and methods for the analysis of motifs
+    and communities in a graph.
+    """
     def compute_motifs(self, algorithm):
+        """Compute motifs of a given graph with netsci package, 
+        using the specified algorithm.
+        Args:
+        ----------
+        algorithm : string
+            2 options:
+                - 'brute-force' : the naive implementation using brute force algorithm.
+                The complexity is high $(O(|V|^3))$, counts all 16 triplets.
+                - 'louzoun' : an efficient algorithm for sparse networks.
+                The complexity is low $(O(|E|))$, but it counts only the 13 connected
+                triplets (the first 3 entries will be -1).
+        """
         motifs = nsm.motifs(
             self.binary_adjacency_matrix.astype(int), algorithm=algorithm)
         print(motifs)
         nsv.bar_motifs(motifs)
 
     def create_graph_motifs(self):
+        """Creates the graph that contains only motifs of the type A->B<-C,
+        using the results of the detected motifs.
+        
+        """
         motifs = nsm.motifs(
             self.binary_adjacency_matrix.astype(int),
             algorithm='louzoun', participation=True)
@@ -50,6 +68,12 @@ class MotifCommunityAnalyzer(ConnectivityGraph):
                          node_color='lightcyan', edge_color='silver')
 
     def get_communities_infomap(self):
+        """Finds the communities in the graph, using the Infomap algorithm.
+        Returns:
+        ----------
+        communities : dictionary
+            node and community at which it belongs to.
+        """
         im = infomap.Infomap("--two-level --directed")
 
         # new_labels = {}
@@ -89,6 +113,12 @@ class MotifCommunityAnalyzer(ConnectivityGraph):
         return communities
 
     def community_composition(self):
+        """Finds the communities in the graph, using the Louvain algorithm.
+        Returns:
+        ----------
+        communities : dictionary
+            node and community at which it belongs to.
+        """
         G_undirected = self.G.to_undirected()
         community = community_louvain.best_partition(G_undirected)
 
@@ -105,5 +135,11 @@ class MotifCommunityAnalyzer(ConnectivityGraph):
         return community
 
     def draw_community_graph(self, communities):
+        """Draws the graph with different colors for different communities.
+        Args:
+        ----------
+        communities : dictionary
+            node and community at which it belongs to.
+        """
         values = [communities.get(node, 0.25) for node in self.G.nodes]
         self.draw_Graph(values)
