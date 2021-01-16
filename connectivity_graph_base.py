@@ -11,7 +11,7 @@ class ConnectivityGraph:
     Connectivity Graphs, directed binary and directed weighted.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, sub_channels=False):
         """
         Args:
         ----------
@@ -24,7 +24,7 @@ class ConnectivityGraph:
         self.channels = None
         self.num_of_channels = None
         self.num_of_samples = None
-        self.read_edf_data(path)
+        self.read_edf_data(path, sub_channels)
         self.channel_locations = None
         self.connectivity_matrix = None
         self.binary_adjacency_matrix = None
@@ -50,7 +50,7 @@ class ConnectivityGraph:
         if sub_channels:
             self.channels = 'Fp1 Fp2 F7 F3 Fz F4 F8 T7 C3 Cz C4 T8 P7 P3 Pz P4 P8 O1 O2'.split(
                 ' ')
-            df = df[sub_channels]
+            df = df[self.channels]
 
         self.values = df.T.values
         self.num_of_channels, self.num_of_samples = self.values.shape
@@ -78,12 +78,13 @@ class ConnectivityGraph:
         """
         if not order:
             best, crit = cp.Mvar.order_akaike(self.values, max_order)
+            p = best
             if plot:
                 plt.plot(1+np.arange(len(crit)), crit, marker='o',
                          linestyle='dashed', markersize=8, markerfacecolor='yellow')
                 plt.grid()
                 plt.show()
-            p = best
+                print('Best model order p: {}'.format(best))
         else:
             p = order
 
@@ -156,9 +157,8 @@ class ConnectivityGraph:
             p = best
         else:
             p = order
-        print()
-        print('best model order p: {}'.format(p))
-        print()
+        print('Best model order p: {}'.format(p))
+        
         data = cp.Data(self.values, chan_names=self.channels)
         data.fit_mvar(p, 'yw')
         if method == 'DTF':
@@ -170,6 +170,8 @@ class ConnectivityGraph:
         significance_matrix[significance_matrix < 0.05] = 1
         significance_matrix[significance_matrix != 1] = 0
         self.significance_matrix = significance_matrix
+        plt.imshow(significance_matrix, cmap='Greys', interpolation='nearest')
+        plt.show()
 
     def draw_Graph(self, values=None):
         if values is not None:
