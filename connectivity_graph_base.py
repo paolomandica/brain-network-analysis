@@ -165,7 +165,7 @@ class ConnectivityGraph:
         self.Gw = nx.relabel.relabel_nodes(Gw, new_labels, copy=True)
         # nx.set_node_attributes(self.Gw, self.channel_locations, "pos")
 
-    def significance(self, method="DTF", max_order, order=None,
+    def significance(self, max_order, method="DTF", order=None,
                      signf_threshold=0.05, Nrep=200, alpha=0.05):
         """Compute and plot the binary matrix having as positive elements
         the related p-values of the significance matrix less than threshold.
