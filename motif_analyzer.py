@@ -52,11 +52,11 @@ class MotifAnalyzer(ConnectivityGraph):
     def get_communities_infomap(self):
         im = infomap.Infomap("--two-level --directed")
 
-        new_labels = {}
-        for i, node in enumerate(self.G.nodes):
-            new_labels[node] = i
-        G = nx.relabel.relabel_nodes(self.G, new_labels, copy=True)
-        # G = G.to_undirected()
+        # new_labels = {}
+        # for i, node in enumerate(self.G.nodes):
+        #     new_labels[node] = i
+        # G = nx.relabel.relabel_nodes(self.G, new_labels, copy=True)
+        G = nx.DiGraph(self.binary_adjacency_matrix)
 
         for n in G.nodes():
             im.add_node(n)
@@ -71,15 +71,22 @@ class MotifAnalyzer(ConnectivityGraph):
         communities = {}
         c = 0
         for com in partition:
+            # print(com)
             for i in com:
                 communities[self.channels[i]] = c
-                c = c+1
+            c = c+1
 
         d = {}
         for key, value in communities.items():
             d.setdefault(value, []).append(key)
 
-        return d
+        for key, value in sorted(d.items()):
+            print("Nodes that belong to community ", key, ":")
+            for i in value:
+                print(i, end=' ')
+            print("\n")
+
+        return communities
 
     def community_composition(self):
         G_undirected = self.G.to_undirected()
